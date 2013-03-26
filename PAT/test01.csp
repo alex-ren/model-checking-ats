@@ -1,0 +1,12 @@
+﻿#import "PAT.Lib.list";
+#import "IntHolder";
+
+var<IntHolder> x = new IntHolder(2);
+var<Monitor> y;
+
+
+P() = a -> {x.set(3);} -> Skip;
+Q() = [x.get() >= 2] b -> Skip;
+System() = P() ||| Q();
+
+// #assert System() |= []<>b;
