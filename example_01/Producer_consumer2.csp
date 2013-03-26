@@ -1,0 +1,39 @@
+﻿//@@Producer_consumer2@@
+
+var mutex = 0;
+
+var cond_count = 0;
+channel cond_chan 0;
+
+var msg1;
+var msg2;
+var n = 0;
+
+mutex_lock = [mutex == 0] mlock{mutex = 1} -> Skip;
+
+mutex_unlock = munlock{mutex = 0} -> Skip;
+
+wait = cadd{cond_count++;} -> mutex_unlock; cond_chan?_ -> mutex_lock;
+
+signal = ifa (cond_count > 0) {
+           csub{cond_count--;} ->
+           cond_chan!1
+           -> Skip
+         };
+         
+Producer = mutex_lock;
+           if (n == 1) {
+             wait
+           }; put{n++;} -> signal; mutex_unlock; Producer;
+
+Consumer = mutex_lock;
+           if (n == 0) {
+             wait
+           }; get{n--;} -> signal; mutex_unlock; Consumer;
+           
+Sys = (Producer ||| Consumer) \{mlock, munlock, cadd, Pv, csub, Vv, cond_chan.1};
+
+#assert Sys deadlockfree;
+
+#define Prop1 (n < 2);
+#assert Sys |= G Prop1;

@@ -1,0 +1,99 @@
+﻿#define N 6;
+
+Phil(i) = get.i.(i+1)%N -> get.i.i -> eat.i -> put.i.(i+1)%N -> put.i.i -> Phil(i);
+Fork(x) = get.x.x -> put.x.x -> Fork(x) [] get.(x-1)%N.x -> put.(x-1)%N.x -> Fork(x);
+Phil0() = get.0.0 -> get.0.1 -> eat.0 -> put.0.0 -> put.0.1 -> Phil0;
+
+College() = ||x:{0..N-1}@(Phil(x)||Fork(x));
+College1() = Phil0|| Fork(0)||(||x:{1..N-1}@(Phil(x)||Fork(x))) ; 
+////////////////The Properties//////////////////
+#assert College() deadlockfree;
+#assert College1() deadlockfree;  // 0.08s
+#assert College1() |= []<> eat.0;
+
+// =================================
+// compared to a, expand the accepting range of Fork
+
+Forkb(n) = [] x:{0..N-1}@(get.x.n -> put.x.n -> Forkb(n));
+
+Collegeb() = ||x:{0..N-1}@(Phil(x)||Forkb(x));
+Collegeb1() = Phil0|| Forkb(0)||(||x:{1..N-1}@(Phil(x)||Forkb(x))) ; 
+////////////////The Properties//////////////////
+#assert Collegeb() deadlockfree;
+#assert Collegeb1() deadlockfree;  // 9s
+#assert Collegeb1() |= []<> eat.0;
+
+// =================================
+// compared to a, add more event
+Forkc(x) = get.x.x -> event.x -> put.x.x -> Forkc(x) [] get.(x-1)%N.x -> event.x -> put.(x-1)%N.x -> Forkc(x);
+
+Collegec() = ||x:{0..N-1}@(Phil(x)||Forkc(x));
+Collegec1() = Phil0|| Forkc(0)||(||x:{1..N-1}@(Phil(x)||Forkc(x))) ; 
+////////////////The Properties//////////////////
+#assert Collegec() deadlockfree;
+#assert Collegec1() deadlockfree;  // 2s
+#assert Collegec1() |= []<> eat.0;
+
+// =================================
+
+// compared to a, add more more event
+
+Forkd(x) = get.x.x -> event.x -> event.x -> event.x -> put.x.x -> Forkd(x) [] get.(x-1)%N.x -> event.x -> event.x -> event.x -> put.(x-1)%N.x -> Forkd(x);
+
+Colleged() = ||x:{0..N-1}@(Phil(x)||Forkd(x));
+Colleged1() = Phil0|| Forkd(0)||(||x:{1..N-1}@(Phil(x)||Forkd(x))) ; 
+////////////////The Properties//////////////////
+#assert Colleged() deadlockfree;
+#assert Colleged1() deadlockfree;  // > 20s
+#assert Colleged1() |= []<> eat.0;
+
+
+// =================================
+
+// compared to a, add more more event but with atomic
+PP(x) = atomic {event.x -> event.x -> event.x -> event.x -> event.x -> event.x -> Skip};
+
+Forke(x) = (get.x.x -> PP(x); put.x.x -> Forke(x)) [] (get.(x-1)%N.x -> PP(x); put.(x-1)%N.x -> Forke(x));
+
+Collegee() = ||x:{0..N-1}@(Phil(x)||Forke(x));
+Collegee1() = Phil0|| Forke(0)||(||x:{1..N-1}@(Phil(x)||Forke(x))) ; 
+////////////////The Properties//////////////////
+#assert Collegee() deadlockfree;
+#assert Collegee1() deadlockfree;  // 1s
+#assert Collegee1() |= []<> eat.0;
+
+// =================================
+// compared to a, add one event for one global variable
+var x1 = 0;
+
+Forkf(x) = get.x.x -> {x1 = 1;} ->put.x.x -> Forkf(x) [] get.(x-1)%N.x -> {x1 = 1;} -> put.(x-1)%N.x -> Forkf(x);
+
+Collegef() = ||x:{0..N-1}@(Phil(x)||Forkf(x));
+Collegef1() = Phil0|| Forkf(0)||(||x:{1..N-1}@(Phil(x)||Forkf(x))) ; 
+////////////////The Properties//////////////////
+#assert Collegef() deadlockfree;
+#assert Collegef1() deadlockfree;  // 2.2s
+#assert Collegef1() |= []<> eat.0;
+
+// =================================
+
+// =================================
+// compared to a, add many events for many global variables but with atomic
+
+var x2 = 0;
+var x3 = 0;
+var x4 = 0;
+var x5 = 0;
+
+PPg(x) = atomic {{x1 = 1;} -> {x2 = 1;} -> {x3 = 1;} -> {x4 = 1;} -> {x5 = 1;} -> Skip};
+
+Forkg(x) = (get.x.x -> PPg(x); put.x.x -> Forkg(x)) [] (get.(x-1)%N.x -> PPg(x); put.(x-1)%N.x -> Forkg(x));
+
+Collegeg() = ||x:{0..N-1}@(Phil(x)||Forkg(x));
+Collegeg1() = Phil0|| Forkg(0)||(||x:{1..N-1}@(Phil(x)||Forkg(x))) ; 
+////////////////The Properties//////////////////
+#assert Collegeg() deadlockfree;
+#assert Collegeg1() deadlockfree;  // 0.8s
+#assert Collegeg1() |= []<> eat.0;
+
+// =================================

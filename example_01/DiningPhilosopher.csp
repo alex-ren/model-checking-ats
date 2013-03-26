@@ -1,0 +1,101 @@
+﻿//@@Dining Philosopher based on explicit thread id and global variable@@
+
+#define N 3;
+
+var mutex[N] = [0(N)];
+mutex_lock(n) = [mutex[n] == 0] mlock{mutex[n] = 1} -> Skip;
+mutex_unlock(n) = munlock{mutex[n] = 0} -> Skip;
+
+get_fork(tid, n) = mutex_lock(n); get_fork_.n -> Skip;
+put_fork(tid, n) = put_fork_.n -> mutex_unlock(n);
+
+get_left_no (tid, n) = {left[tid] = n;} -> Skip;
+get_right_no (tid, n) = {right[tid] = (n + 1)%N;} -> Skip;
+
+var left[N] = [0(N)];
+var right[N] = [0(N)];
+
+dp(tid, n) = get_left_no (tid, n);
+             get_right_no (tid, n);
+             get_fork (tid, left[tid]);
+             get_fork (tid, right[tid]);
+             eat.n -> Skip;
+             put_fork (tid, left[tid]);
+             put_fork (tid, right[tid]);
+             dp (tid, n);    
+             
+dpr (tid, n) = get_left_no (tid, n);
+             get_right_no (tid, n);
+             get_fork (tid, right[tid]);
+             get_fork (tid, left[tid]);
+             eat.n -> Skip;
+             put_fork (tid, right[tid]);
+             put_fork (tid, left[tid]);
+             dpr (tid, n);    
+
+             
+Sys = ||| n: {0..N-1} @ dp (n, n) \{mlock, munlock};
+
+Sys1 = (||| n: {0..N-2} @ dp (n, n) ||| dpr (N-1, N-1)) \{mlock, munlock};
+
+
+// =========================================
+#assert Sys deadlockfree;
+#assert Sys1 deadlockfree;
+
+// =========================================
+
+dp_atomic(tid, n) = atomic {get_left_no (tid, n);
+             get_right_no (tid, n);
+             get_fork (tid, left[tid])};
+             get_fork (tid, right[tid]);
+             eat.n -> Skip;
+             put_fork (tid, left[tid]);
+             put_fork (tid, right[tid]);
+             dp (tid, n);    
+             
+dpr_atomic (tid, n) = atomic {get_left_no (tid, n);
+             get_right_no (tid, n);
+             get_fork (tid, right[tid])};
+             get_fork (tid, left[tid]);
+             eat.n -> Skip;
+             put_fork (tid, right[tid]);
+             put_fork (tid, left[tid]);
+             dpr (tid, n);    
+
+Sys_atomic = ||| n: {0..N-1} @ dp_atomic (n, n) \{mlock, munlock};
+
+Sys1_atomic = (||| n: {0..N-2} @ dp_atomic (n, n) ||| dpr_atomic (N-1, N-1)) \{mlock, munlock};
+// Sys1_atomic1 = (||| n: {0..N-2} @ dp_atomic (n, n) ||| dpr_atomic (N-1, N-1)) \{mlock, munlock, n:{0..N-1}@get_fork_.n, x:{0..N-1}@put_fork_.x, eat.1, eat.2, eat.3, eat.4};
+
+
+
+// =========================================
+
+#assert Sys_atomic deadlockfree;
+#assert Sys1_atomic deadlockfree;
+
+#assert Sys1_atomic() |= []<> eat.0;
+
+//
+//Specification() = eat.0 -> Specification();
+//#assert Sys1_atomic1() refines Specification();
+//#assert Specification() refines Sys1_atomic1();
+//#assert Sys1_atomic1() refines <F> Specification();
+//#assert Specification() refines <F> Sys1_atomic1();
+//#assert Sys1_atomic1() refines <FD> Specification();
+//#assert Specification() refines <FD> Sys1_atomic1();
+
+////-------------------------------------
+
+Phil(i) = get.i.(i+1)%N -> get.i.i -> eat.i -> put.i.(i+1)%N -> put.i.i -> Phil(i);
+Fork(x) = get.x.x -> put.x.x -> Fork(x) [] get.(x-1)%N.x -> put.(x-1)%N.x -> Fork(x);
+Phil0 = get.0.0 -> get.0.1 -> eat.0 -> put.0.0 -> put.0.1 -> Phil0;
+
+College() = ||x:{0..N-1}@(Phil(x)||Fork(x));
+College1() = Phil0|| Fork(0)||(||x:{1..N-1}@(Phil(x)||Fork(x))) ; 
+////////////////The Properties//////////////////
+#assert College() deadlockfree;
+#assert College1() deadlockfree;
+#assert College1() |= []<> eat.0;
+

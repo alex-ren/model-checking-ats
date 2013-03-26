@@ -1,0 +1,56 @@
+﻿//@@Producer_consumer2@@
+
+var mutex = 0;
+
+var cond_count = 0;
+channel cond_chan 0;
+
+var msg1;
+var msg2;
+var n = 0;
+
+
+mutex_lock = [mutex == 0] mlock{mutex = 1} -> Skip;
+
+mutex_unlock = munlock{mutex = 0} -> Skip;
+
+wait = cadd{cond_count++;} -> mutex_unlock; cond_chan?_ -> mutex_lock;
+
+channel user_input_ret 0;
+
+user_input = <> x: {1, 2, 3}@user_input_ret!x -> user_input;
+
+channel msgchan 0;
+
+output = msgchan?m -> USE_MSG -> USE_MSG_N.m -> output;
+
+signal = ifa (cond_count > 0) {
+           csub{cond_count--;} ->
+           cond_chan!1
+           -> Skip
+         };
+       
+Producer = mutex_lock;
+           user_input_ret?m -> GET_MSG -> GET_MSG_N.m ->
+           if (n == 1) {
+             wait; put{msg1 = m; n++} -> signal; mutex_unlock; Producer
+           } else {
+             put{msg1 = m; n++} -> signal; mutex_unlock; Producer
+           };
+
+var Consumer_local = 0;
+Consumer = mutex_lock;
+           if (n == 0) {
+             wait
+           }; get{Consumer_local = msg1; n--;} -> signal; mutex_unlock; msgchan!msg1 -> Consumer;
+           
+Sys = (user_input ||| Producer ||| Consumer ||| output) \{mlock, munlock, cadd, Pv, csub, Vv, cond_chan.1};
+
+#assert Sys deadlockfree;
+
+#define Prop1 (n < 2);
+#assert Sys |= G Prop1;
+#assert Sys |= G (GET_MSG -> F (USE_MSG));
+#assert Sys |= G (GET_MSG_N.1 -> F (USE_MSG_N.1));
+
+
