@@ -11,14 +11,14 @@ var<PStack> GStack = new PStack();
 var g = 3;
 
 main0(tid, x) = enter{GStack.newFrame(tid);}
-   -> {var y = 1 + x; GStack.push(tid, y)/* LOC OF y == 0 */;} 
-   -> {var y = GStack.get(tid, 0); var z = y * g; GStack.push(tid, z) /* LOC z == 0 */;}
+   -> s1{var y = 1 + x; GStack.push(tid, y)/* LOC OF y == 0 */;} 
+   -> s2{var y = GStack.get(tid, 0); var z = y * g; GStack.push(tid, z) /* LOC z == 0 */;}
    -> a -> return{var z = GStack.get(tid, 0); GStack.deleteFrame(tid); GStack.push(tid, z);}
    -> Skip;
 
-foo(tid, x) = enter{GStack.newFrame(tid);} -> {g = x;} -> Evt_foo -> return{GStack.deleteFrame(tid)} -> Skip;
+foo(tid, x) = enter{GStack.newFrame(tid);} -> f1{g = x;} -> Evt_foo -> return{GStack.deleteFrame(tid)} -> Skip;
 
-Main = {GStack.addStack(); GStack.newFrame(0);} -> main0(0, 1); 
+Main = ginit{GStack.addStack(); GStack.newFrame(0);} -> main0(0, 1); 
        foo (0, GStack.get(0, 0)); 
        Skip;
        
