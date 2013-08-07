@@ -1,0 +1,36 @@
+﻿#import "PAT.Lib.Set";
+// #import "IATSRuntime";
+#import "IntHolder";
+
+// #define GetTid(x) 3;
+
+Ins1 (tid) = a1 -> a2 -> a3 -> Skip;
+Ins2 (tid) = b1 -> b2 -> b3 -> Skip;
+Ins3 (tid) = c1 -> c2 -> c3 -> Skip;
+
+// 0: NA
+// 1: Runnable
+// 2: Stopped
+var threads_stat[3] = [1, 0, 0];
+
+var threads_ret[5];
+
+
+
+// main = Ins0a(GetTid()) ||| Ins0b (GetTid())
+main = {threads_ret[0] = call(GetTid, threads_stat);} ->
+       { threads_ret[1] = call(GetTid, threads_stat);} ->
+        {threads_ret[2] = call(GetTid, threads_stat);} ->
+       { threads_ret[3] = call(GetTid, threads_stat);} ->
+          (createThread(threads_ret[0], 1) ||| main_end -> Skip);
+
+createThread(tid, entry_id) = case {
+  entry_id == 0: Ins1 (tid)
+  entry_id == 1: Ins2 (tid)
+  entry_id == 2: Ins3 (tid)
+};
+
+
+
+
+

@@ -1,0 +1,22 @@
+﻿/*
+* Test of usage of ifa / ifb.
+*
+*/
+var G = 0;
+var Y = 2;
+P1 = ifa (G == 0) {acquire1{G=1;} -> Skip};
+P2 = ifa (G == 0) {acquire2{G=1;} -> Skip};
+
+P1b = ifb (G == 0) {acquire1{G=1;} -> Skip};
+
+P = P1 ||| P2;
+Pb = P1b ||| P2; 
+
+#assert P1 refines<FD> P1b;
+
+#assert P1b refines<FD> P1;
+
+
+#assert P refines<FD> Pb;
+
+#assert Pb refines<FD> P;

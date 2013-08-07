@@ -1,0 +1,11 @@
+﻿/*
+* PAT/test05_sequence.csp
+* Test of sequential composition.
+*/
+
+P = P1 ||| P2;
+
+P1 = a1 -> a2 -> Skip;
+P2 = b1 -> b2 -> Skip;
+
+Q = P; c -> Skip;

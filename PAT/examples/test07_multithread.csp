@@ -1,0 +1,40 @@
+﻿
+#import "PStack";
+
+var GTid = 0;
+
+channel ChSch 0;
+channel ChSchStart 0;
+
+Scheduler = ChSch?fn.arg ->
+  ifa (fn == 0) {
+    foo_s (arg) ||| SchedulerW
+  }
+  else ifa (fn == 1) {
+    main_s (arg) ||| SchedulerW
+  }
+  ;
+
+SchedulerW = ChSchStart!GTid -> incTid{GTid = GTid + 1;} -> Scheduler;
+
+// var<MySchedule> Gsch = new MySchedule();
+
+var<PStack> GStack = new PStack();
+
+// ======================
+var g_foo;
+var g_main;
+
+foo_s (x) = ChSchStart?tid -> foo (tid, x);
+
+main_s (x) = ChSchStart?tid -> main (tid, x);
+
+foo (tid, x) = a{g_foo = tid;} -> Skip;
+
+main (tid, x) = b{g_main = tid;} -> Skip;
+
+Main = ChSch!0.1 -> ChSch!1.1 -> Skip;
+
+P = Main ||| Scheduler;
+
+

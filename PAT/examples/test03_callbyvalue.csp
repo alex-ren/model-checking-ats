@@ -1,0 +1,14 @@
+﻿/*
+* PAT/test03_callbyvalue.csp
+* Y is 3 in the end, which means it's not call-by-value.
+*/
+
+var G = 1;
+var Y;
+
+P = Q (G) || P1;
+
+Q (x) = a -> {Y = x + 1;} -> Skip;
+
+P1 = {G = G + 1;} -> a -> Skip;
+
