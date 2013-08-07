@@ -1,4 +1,6 @@
-example 01\
-  Examples written during the preparation of funding application proposal.
+Subproject for Model Checking ATS.
+Please refer to the following link for details.
+https://docs.google.com/document/d/100m1ziVENy5lfmqTARAZNxM4sEo238OThllu8Cix0_s/edit?usp=sharing
+
 
 
