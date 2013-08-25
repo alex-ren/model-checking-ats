@@ -43,7 +43,9 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="FStack.cs" />
+    <Compile Include="FrameStackUtil.cs" />
+    <Compile Include="FLenStack.cs" />
+    <Compile Include="FStackNode.cs" />
     <Compile Include="PStack.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

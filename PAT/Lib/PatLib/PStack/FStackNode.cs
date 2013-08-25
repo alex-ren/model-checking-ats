@@ -6,50 +6,52 @@ using System.Text;
 using PAT.Lib;
 
 namespace PAT.Lib
-{ 
+{
 
-    public class FStack<T>
+    public class FStackNode<T>
     {
         private T m_v;
-        private FStack<T> m_tail;
+        private FStackNode<T> m_tail;
 
-        public FStack()
-        {
-            throw new System.Exception();
-        }
-
-        public FStack(T x, FStack<T> s)
+        private FStackNode(T x, FStackNode<T> s)
         {
             m_v = x;
             m_tail = s;
         }
 
-        public static FStack<T> newFStack()
+        public static FStackNode<T> create()
         {
             return null;
         }
 
-        public static FStack<T> push(FStack<T> s, T x)
+        public static FStackNode<T> push(FStackNode<T> s, T x)
         {
-            return new FStack<T>(x, s);
+            return new FStackNode<T>(x, s);
         }
 
-        public static FStack<T> pop(FStack<T> s)
+        public T getValue()
         {
-            return s.m_tail;
+            return m_v;
         }
 
-        public static T get(FStack<T> s, int pos)
+        public FStackNode<T> getNext()
         {
+            return m_tail;
+        }
+
+        public T getAtPos(int pos)
+        {
+            FStackNode<T> node = this;
             while (pos > 0)
             {
-                s = s.m_tail;
+                node = node.getNext();
                 pos--;
             }
-            return s.m_v;
+
+            return node.getValue();
         }
 
-        public static bool isEmpty(FStack<T> s)
+        public static bool isEmpty(FStackNode<T> s)
         {
             return null == s;
         }
@@ -61,7 +63,7 @@ namespace PAT.Lib
 
         private string encode()
         {
-            FStack<T> s = this;
+            FStackNode<T> s = this;
             String returnString = "";
             do
             {

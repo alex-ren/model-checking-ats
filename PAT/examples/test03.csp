@@ -1,0 +1,5 @@
+﻿#import "MyLib";
+
+var x = call (mul, 2, 3);
+
+P() = step{x = call(sub, x, 1);} -> Skip;

@@ -7,8 +7,8 @@ using PAT.Lib;
 //the namespace must be PAT.Lib, the class and method names can be arbitrary
 namespace PAT.Lib
 {
-    using Frame = FStack<object>;
-    using FrameStack = FStack<FStack<object>>;
+    using Frame = FLenStack<Object>;
+    using FrameStack = FStackNode<FLenStack<Object>>;
 
     /// <summary>
     /// The math library that can be used in your model.
@@ -26,7 +26,7 @@ namespace PAT.Lib
     /// </summary>
     public class PStack : ExpressionValue
     {
-        
+
         private List<FrameStack> m_stacks;
 
         public PStack()
@@ -41,38 +41,32 @@ namespace PAT.Lib
 
         public void addStack()
         {
-            m_stacks.Add(FrameStack.newFStack());
+            FrameStack t = FrameStackUtil.create();
+            m_stacks.Add(t);
         }
 
         public void newFrame(int tid)
         {
             FrameStack sf = m_stacks[tid];  // stack of frames
-            Frame frame = Frame.newFStack();
-            m_stacks[tid] = FrameStack.push(sf, frame);
+            m_stacks[tid] = FrameStackUtil.newFrame(sf);
         }
 
         public void deleteFrame(int tid)
         {
             FrameStack sf = m_stacks[tid];  // stack of frames
-            m_stacks[tid] = FrameStack.pop(sf);
+            m_stacks[tid] = FrameStackUtil.deleteFrame(sf);
         }
 
         public void push(int tid, int v)
         {
             FrameStack sf = m_stacks[tid];  // stack of frames
-            Frame frame = FrameStack.get(sf, 0);  // frame
-            frame = Frame.push(frame, v);
-            sf = FrameStack.pop(sf);
-            sf = FrameStack.push(sf, frame);
-            m_stacks[tid] = sf;
+            m_stacks[tid] = FrameStackUtil.push(sf, v);
         }
 
-        public int get(int tid, int index)
+        public int get(int tid, int frame, int index)
         {
             FrameStack sf = m_stacks[tid];  // stack of frames
-            Frame frame = FrameStack.get(sf, 0);  // frame
-            int ret = (int)Frame.get(frame, index);
-            return ret;
+            return (int)FrameStackUtil.get(sf, frame, index);
         }
 
         /// <summary>
@@ -91,7 +85,8 @@ namespace PAT.Lib
         /// <returns></returns>
         public override ExpressionValue GetClone()
         {
-            return new PStack(new List<FrameStack>(m_stacks));
+            List<FrameStack> fsLst = new List<FrameStack>(m_stacks);
+            return new PStack(fsLst);
         }
 
         private string encode()

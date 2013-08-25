@@ -1,0 +1,26 @@
+﻿#import "PStack";
+#import "MyLib";
+
+// ======================
+
+var<PStack> GStack = new PStack();
+
+var g_17;
+
+fact_15(tid, x_16) = preloge{GStack.newFrame(tid); } ->
+step {
+  var app_19 = call(gt, x_16, 0); GStack.push(tid, app_19);} -> Skip;
+ifa ((sget(tid, 0, 0))) then {
+	step {
+  	var app_21 = call(sub, x_16, 1); GStack.push(tid, app_21);} -> Skip;
+	fact_15(tid, app_21@(sget(tid, 0, 1)));
+	step {
+  	var ret_18 = mul(app_20@(sget(tid, 0, 2)), x_16); GStack.deleteFrame(tid);GStack.push(tid, ret_18);} -> Skip;
+} else {
+	step {
+  	var ret_18 = 1; GStack.deleteFrame(tid);GStack.push(tid, ret_18);} -> Skip;
+};
+
+main() = step {
+  g_17 = 0; } -> Skip;
+fact_15(tid, 3);

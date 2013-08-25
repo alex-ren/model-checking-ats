@@ -21,6 +21,22 @@ namespace PAT.Lib
     /// </summary>
     public class Example
     {
+
+        public static int sub(int x, int y)
+        {
+            return x - y;
+        }
+
+        public static int mul(int x, int y)
+        {
+            return x * y;
+        }
+
+        public static bool gt(int x, int y)
+        {
+            return x > y;
+        }
+
         //==========================================================
         //the following sections are the functions used by Mailbox 
         //==========================================================
