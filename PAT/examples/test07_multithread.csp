@@ -8,33 +8,46 @@ channel ChSchStart 0;
 
 Scheduler = ChSch?fn.arg ->
   ifa (fn == 0) {
-    foo_s (arg) ||| SchedulerW
+    crt{GTid++;GStack.addStack();} ->
+    fooa_s (GTid, arg) ||| SchedulerW (GTid)
   }
   else ifa (fn == 1) {
-    main_s (arg) ||| SchedulerW
+    crt{GTid++;GStack.addStack();} ->
+    foob_s (GTid, arg) ||| SchedulerW (GTid)
   }
+  else ifa (fn == 2) {
+    crt{GTid++;GStack.addStack();} ->
+    fooc_s (GTid, arg) ||| SchedulerW (GTid)
+  }  
   ;
 
-SchedulerW = ChSchStart!GTid -> incTid{GTid = GTid + 1;} -> Scheduler;
+SchedulerW (tid) = ChSchStart?tid -> Scheduler;
 
 // var<MySchedule> Gsch = new MySchedule();
 
 var<PStack> GStack = new PStack();
 
 // ======================
-var g_foo;
-var g_main;
 
-foo_s (x) = ChSchStart?tid -> foo (tid, x);
 
-main_s (x) = ChSchStart?tid -> main (tid, x);
+fooa_s (tid, x) = ChSchStart!tid -> fooa (tid, x);
 
-foo (tid, x) = a{g_foo = tid;} -> Skip;
+foob_s (tid, x) = ChSchStart!tid -> foob (tid, x);
 
-main (tid, x) = b{g_main = tid;} -> Skip;
+fooc_s (tid, x) = ChSchStart!tid -> fooc (tid, x);
 
-Main = ChSch!0.1 -> ChSch!1.1 -> Skip;
+fooa (tid, x) = a1 -> a2 -> a3 -> Skip;
 
-P = Main ||| Scheduler;
+foob (tid, x) = b1 -> b2 -> b3 -> Skip;
+
+fooc (tid, x) = c1 -> c2 -> c3 -> Skip;
+
+
+
+Main = ChSch!0.1 -> ChSch!1.1 -> ChSch!2.1 -> Skip;
+
+main = Main ||| Scheduler;
+
+main2 = fooa(0, 1) ||| foob(0, 1) ||| fooc(0, 1);
 
 

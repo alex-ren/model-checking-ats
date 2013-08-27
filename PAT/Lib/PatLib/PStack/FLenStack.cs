@@ -57,7 +57,7 @@ namespace PAT.Lib
 
         public T getFromBottom(int pos)
         {
-            return getFromTop(m_len - pos);
+            return getFromTop(m_len -1 - pos);
         }
 
         public bool isEmpty()

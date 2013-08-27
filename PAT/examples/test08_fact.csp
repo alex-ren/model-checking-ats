@@ -1,26 +1,73 @@
 ﻿#import "PStack";
+
 #import "MyLib";
 
-// ======================
+// =====================
 
 var<PStack> GStack = new PStack();
+var GTid = 0;
+
+channel ChSch 0;
+channel ChSchStart 0;
+
+Scheduler = ChSch?fn.arg ->
+  ifa (fn == 0) {
+    inctid{GTid++; GStack.addStack();} ->
+    main1_s (GTid, arg) ||| SchedulerW (GTid)
+  } else ifa (fn == 1) {
+    inctid{GTid++; GStack.addStack();} ->
+    fact_15_s (GTid, arg) ||| SchedulerW (GTid)
+  }
+  ;
+  
+SchedulerW (tid) = ChSchStart?tid -> Scheduler;
+
+// =====================
 
 var g_17;
 
 fact_15(tid, x_16) = preloge{GStack.newFrame(tid); } ->
-step {
-  var app_19 = call(gt, x_16, 0); GStack.push(tid, app_19);} -> Skip;
-ifa ((sget(tid, 0, 0))) then {
-	step {
-  	var app_21 = call(sub, x_16, 1); GStack.push(tid, app_21);} -> Skip;
-	fact_15(tid, app_21@(sget(tid, 0, 1)));
-	step {
-  	var ret_18 = mul(app_20@(sget(tid, 0, 2)), x_16); GStack.deleteFrame(tid);GStack.push(tid, ret_18);} -> Skip;
+
+step1 {
+
+ var app_19 = call(gt, x_16, 0); GStack.push(tid, app_19);} -> Skip;
+
+ifa (GStack.getBool(tid, 0, 0)) {
+
+    stept1 {
+
+     var app_21 = call(sub, x_16, 1); GStack.push(tid, app_21);} -> Skip;
+
+    fact_15(tid, GStack.get(tid, 0, 1));
+
+    stept2 {
+
+     var ret_18 = call(mul, GStack.get(tid, 0, 2), x_16); GStack.deleteFrame(tid);GStack.push(tid, ret_18);} -> Skip
+
 } else {
-	step {
-  	var ret_18 = 1; GStack.deleteFrame(tid);GStack.push(tid, ret_18);} -> Skip;
+
+    stepf {
+
+     var ret_18 = 1; GStack.deleteFrame(tid);GStack.push(tid, ret_18);} -> Skip
+
 };
 
-main() = step {
-  g_17 = 0; } -> Skip;
-fact_15(tid, 3);
+main1(tid, x) = preloge{GStack.newFrame(tid);} -> Skip;
+
+stepm1 {
+
+ g_17 = 0; } -> Skip;
+
+fact_15(tid, x);
+
+stepm2 {
+
+ g_17 = GStack.get(tid, 0, 0); GStack.deleteFrame(tid);} -> Skip;
+ 
+main1_s (tid, x) = ChSchStart!tid -> main1 (tid, x);
+
+fact_15_s (tid, x) = ChSchStart!tid -> fact_15 (tid, x);
+
+main0() = main_preloge {GStack.addStack();} -> ChSch!0.2 -> ChSch!0.2 -> Skip;
+
+main = main0 ||| Scheduler;

@@ -57,16 +57,28 @@ namespace PAT.Lib
             m_stacks[tid] = FrameStackUtil.deleteFrame(sf);
         }
 
-        public void push(int tid, int v)
+        public void push(int tid, Object v)
         {
             FrameStack sf = m_stacks[tid];  // stack of frames
             m_stacks[tid] = FrameStackUtil.push(sf, v);
         }
 
-        public int get(int tid, int frame, int index)
+        public bool getBool(int tid, int frame, int index)
+        {
+            Object ret = get(tid, frame, index);
+            return (bool)ret;
+        }
+
+        public int getInt(int tid, int frame, int index)
+        {
+            Object ret = get(tid, frame, index);
+            return (int)ret;
+        }
+
+        public Object get(int tid, int frame, int index)
         {
             FrameStack sf = m_stacks[tid];  // stack of frames
-            return (int)FrameStackUtil.get(sf, frame, index);
+            return FrameStackUtil.get(sf, frame, index);
         }
 
         /// <summary>
