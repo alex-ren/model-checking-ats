@@ -10,9 +10,11 @@ var GTid = 0;
 channel ChSch 0;
 channel ChSchStart 0;
 
+#define createThread(fn, arg) = 
+
 Scheduler = ChSch?fn.arg ->
   ifa (fn == 0) {
-    inctid{GTid++; GStack.addStack();} ->
+    init{GTid++; var tid = GTid; GStack.allocateStack(tid);} ->
     main1_s (GTid, arg) ||| SchedulerW (GTid)
   } else ifa (fn == 1) {
     inctid{GTid++; GStack.addStack();} ->
@@ -64,10 +66,22 @@ stepm2 {
 
  g_17 = GStack.get(tid, 0, 0); GStack.deleteFrame(tid);} -> Skip;
  
-main1_s (tid, x) = ChSchStart!tid -> main1 (tid, x);
+main1_s (tid, x) = ChSchStart!tid -> 
+                   main1 (tid, x); 
+                   {GStack.releaseStack(tid)} -> 
+                   Skip; 
 
-fact_15_s (tid, x) = ChSchStart!tid -> fact_15 (tid, x);
+fact_15_s (tid, x) = ChSchStart!tid -> 
+                     fact_15 (tid, x); 
+                     {GStack.releaseStack(tid)} ->
+                     Skip;
 
-main0() = main_preloge {GStack.addStack();} -> ChSch!0.2 -> ChSch!0.2 -> Skip;
+main0() = main_preloge {GStack.addStack();} -> createThread(0, 2) ChSch!0.2 -> ChSch!0.2 -> Skip;
 
 main = main0 ||| Scheduler;
+
+
+
+
+
+
