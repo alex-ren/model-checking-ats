@@ -5,24 +5,24 @@
 // =====================
 
 var<PStack> GStack = new PStack();
-var GTid = 0;
+var SysTid = 0;
 
-channel ChSch 0;
-channel ChSchStart 0;
+channel SysChSch 0;
+channel SysChSchStart 0;
 
-#define createThread(fn, arg) = 
+createThread(fn, arg) = SysChSch!fn.arg -> Skip;
 
-Scheduler = ChSch?fn.arg ->
+Scheduler = SysChSch?fn.arg ->
   ifa (fn == 0) {
-    init{GTid++; var tid = GTid; GStack.allocateStack(tid);} ->
-    main1_s (GTid, arg) ||| SchedulerW (GTid)
+    init{SysTid++; var tid = SysTid; GStack.allocateStack(tid);} ->
+    main1_s (SysTid, arg) ||| SchedulerW (SysTid)
   } else ifa (fn == 1) {
-    inctid{GTid++; GStack.addStack();} ->
-    fact_15_s (GTid, arg) ||| SchedulerW (GTid)
+    inctid{SysTid++; GStack.addStack();} ->
+    fact_15_s (SysTid, arg) ||| SchedulerW (SysTid)
   }
   ;
   
-SchedulerW (tid) = ChSchStart?tid -> Scheduler;
+SchedulerW (tid) = SysChSchStart?tid -> Scheduler;
 
 // =====================
 
@@ -66,17 +66,17 @@ stepm2 {
 
  g_17 = GStack.get(tid, 0, 0); GStack.deleteFrame(tid);} -> Skip;
  
-main1_s (tid, x) = ChSchStart!tid -> 
+main1_s (tid, x) = SysChSchStart!tid -> 
                    main1 (tid, x); 
                    {GStack.releaseStack(tid)} -> 
                    Skip; 
 
-fact_15_s (tid, x) = ChSchStart!tid -> 
+fact_15_s (tid, x) = SysChSchStart!tid -> 
                      fact_15 (tid, x); 
                      {GStack.releaseStack(tid)} ->
                      Skip;
 
-main0() = main_preloge {GStack.addStack();} -> createThread(0, 2) ChSch!0.2 -> ChSch!0.2 -> Skip;
+main0() = main_preloge {GStack.addStack();} -> createThread(0, 2); createThread(0, 2); Skip;
 
 main = main0 ||| Scheduler;
 
