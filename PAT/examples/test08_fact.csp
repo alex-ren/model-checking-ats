@@ -13,11 +13,10 @@ channel SysChSchStart 0;
 createThread(fn, arg) = SysChSch!fn.arg -> Skip;
 
 Scheduler = SysChSch?fn.arg ->
+  init{SysTid++; var tid = SysTid; GStack.allocateStack(tid);} ->
   ifa (fn == 0) {
-    init{SysTid++; var tid = SysTid; GStack.allocateStack(tid);} ->
     main1_s (SysTid, arg) ||| SchedulerW (SysTid)
   } else ifa (fn == 1) {
-    inctid{SysTid++; GStack.addStack();} ->
     fact_15_s (SysTid, arg) ||| SchedulerW (SysTid)
   }
   ;
@@ -76,9 +75,9 @@ fact_15_s (tid, x) = SysChSchStart!tid ->
                      {GStack.releaseStack(tid)} ->
                      Skip;
 
-main0() = main_preloge {GStack.addStack();} -> createThread(0, 2); createThread(0, 2); Skip;
+main_s(tid) = main_preloge {GStack.allocateStack(tid);} -> createThread(0, 2); createThread(0, 2); Skip;
 
-main = main0 ||| Scheduler;
+main = main_s(0) ||| Scheduler;
 
 
 
