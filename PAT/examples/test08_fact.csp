@@ -5,82 +5,115 @@
 // =====================
 
 var<PStack> GStack = new PStack();
+
 var SysTid = 0;
 
 channel SysChSch 0;
+
 channel SysChSchStart 0;
 
 createThread(fn, arg) = SysChSch!fn.arg -> Skip;
 
 Scheduler = SysChSch?fn.arg ->
-  init{SysTid++; var tid = SysTid; GStack.allocateStack(tid);} ->
-  ifa (fn == 0) {
-    main1_s (SysTid, arg) ||| SchedulerW (SysTid)
-  } else ifa (fn == 1) {
-    fact_15_s (SysTid, arg) ||| SchedulerW (SysTid)
-  }
-  ;
-  
+
+ initSch{SysTid++; var tid = SysTid; GStack.allocateStack(tid);} ->
+
+ if (fn == 1) {
+
+    fact_s(SysTid, arg)
+
+    |||
+
+    SchedulerW(SysTid)
+
+ }
+
+ ;
+
+
 SchedulerW (tid) = SysChSchStart?tid -> Scheduler;
 
 // =====================
 
 var g_17;
 
-fact_15(tid, x_16) = preloge{GStack.newFrame(tid); } ->
+fact_15(tid, x_16) =
 
-step1 {
+ preloge{GStack.newFrame(tid); } ->
 
- var app_19 = call(gt, x_16, 0); GStack.push(tid, app_19);} -> Skip;
+ {  var app_19 = call(gt, x_16, 0);
 
-ifa (GStack.getBool(tid, 0, 0)) {
+ GStack.push(tid, app_19);
 
-    stept1 {
+ } ->
 
-     var app_21 = call(sub, x_16, 1); GStack.push(tid, app_21);} -> Skip;
+ if (GStack.getBool(tid, 0, 0)) {
+
+    {  var app_21 = call(sub, x_16, 1);
+
+    GStack.push(tid, app_21);
+
+    } ->
 
     fact_15(tid, GStack.get(tid, 0, 1));
 
-    stept2 {
+    {  var ret_18 = call(mul, GStack.get(tid, 0, 2), x_16);
 
-     var ret_18 = call(mul, GStack.get(tid, 0, 2), x_16); GStack.deleteFrame(tid);GStack.push(tid, ret_18);} -> Skip
+    GStack.deleteFrame(tid); GStack.push(tid, ret_18);
 
-} else {
+    } ->
 
-    stepf {
+    Skip
 
-     var ret_18 = 1; GStack.deleteFrame(tid);GStack.push(tid, ret_18);} -> Skip
+ } else {
 
-};
+    {  var ret_18 = 1;
 
-main1(tid, x) = preloge{GStack.newFrame(tid);} -> Skip;
+    GStack.deleteFrame(tid); GStack.push(tid, ret_18);
 
-stepm1 {
+    } ->
 
- g_17 = 0; } -> Skip;
+    Skip
 
-fact_15(tid, x);
+ };
 
-stepm2 {
+ Skip
 
- g_17 = GStack.get(tid, 0, 0); GStack.deleteFrame(tid);} -> Skip;
- 
-main1_s (tid, x) = SysChSchStart!tid -> 
-                   main1 (tid, x); 
-                   {GStack.releaseStack(tid)} -> 
-                   Skip; 
+ ;
 
-fact_15_s (tid, x) = SysChSchStart!tid -> 
-                     fact_15 (tid, x); 
-                     {GStack.releaseStack(tid)} ->
-                     Skip;
+fact_s(tid, x_16) =
 
-main_s(tid) = main_preloge {GStack.allocateStack(tid);} -> createThread(0, 2); createThread(0, 2); Skip;
+ preloge{GStack.newFrame(tid); } ->
+
+ SysChSchStart!tid ->
+
+ fact_15(tid, x_16)
+
+ ;
+
+main_s(tid) =
+
+ main_preloge {GStack.allocateStack(tid); GStack.newFrame(tid); GStack.newFrame(tid);} ->
+
+ {  g_17 = 0;
+
+ } ->
+
+ fact_15(tid, 4);
+
+ {  g_17 = GStack.get(tid, 0, 0);
+
+ } ->
+
+ {  var main_ret_24 = 0;
+
+ GStack.deleteFrame(tid); GStack.push(tid, main_ret_24);
+
+ } ->
+
+ Skip;
 
 main = main_s(0) ||| Scheduler;
-
-
-
 
 
 

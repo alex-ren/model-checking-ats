@@ -39,10 +39,16 @@ namespace PAT.Lib
             m_stacks = ss;
         }
 
-        public void addStack()
+        public void allocateStack(int tid)
         {
+            int len = m_stacks.Count;
+            while (tid >= len) {
+                m_stacks.Add(FrameStackUtil.create());
+                ++len;
+            }
+
             FrameStack t = FrameStackUtil.create();
-            m_stacks.Add(t);
+            m_stacks[tid] = t;
         }
 
         public void newFrame(int tid)
