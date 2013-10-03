@@ -1,0 +1,69 @@
+﻿
+var mutex[10];  // 10 mutex
+
+var cond_count[10];  // 10 condition
+channel cond_chan[10] 0;
+
+var ret[20]; // 20 threads
+
+var gn = 0;
+
+mutex_lock(m) = [mutex[m] == 0] mlock{mutex[m] = 1} -> Skip;
+
+mutex_unlock(m) = munlock{mutex[m] = 0} -> Skip;
+
+wait(c, m) = atomic{cadd{cond_count[c]++;} -> mutex_unlock(m); cond_chan[c]?_ -> mutex_lock(m)};
+
+signal(c) = atomic {if (cond_count[c] > 0) {
+           csub{cond_count[c]--;} ->
+           cond_chan[c]!1
+           -> Skip
+         }};
+         
+broadcast(c) = atomic{if (cond_count[c] > 0) {
+           signaln(c, cond_count[c]); csub{cond_count[c]=0;} -> Skip
+         }};
+         
+signaln(c, n) = if (n > 0) {cond_chan[c]!1 -> signaln(c, n-1)}
+                else {Skip}
+                ;
+         
+Producer = mutex_lock(0);
+           if (gn == 1) {
+             wait(0, 0)
+           }; put{gn++;} -> broadcast(0); mutex_unlock(0); Producer; 
+
+Consumer1 = mutex_lock(0);
+           if (gn == 0) {
+             wait(0, 0)
+           }; get{gn--;} -> signal(0); mutex_unlock(0); Consumer1;
+           
+Consumer2 = mutex_lock(0);
+           if (gn == 0) {
+             wait(0, 0)
+           }; get{gn--;} -> broadcast(0); mutex_unlock(0); Consumer2;
+
+amain1 = Producer ||| Consumer1;
+amain2 = Producer ||| Consumer2;
+
+var gnn = 0;
+P1 = mutex_lock(1); p1a{gnn++;} -> wait(1, 1); p1b -> mutex_unlock(1);
+P2 = mutex_lock(1); p2a{gnn++;} -> wait(1, 1); p2b -> mutex_unlock(1);
+Q = ifa (gnn == 2) {mutex_lock(1); signal(1); qa -> mutex_unlock(1)};
+amain3 = P1 ||| P2 ||| Q;
+
+//var Consumer_local = 0;
+//Consumer = mutex_lock;
+//           if (n == 0) {
+//             wait
+//           }; get{Consumer_local = msg1; n--;} -> signal; mutex_unlock; msgchan!msg1 -> Consumer;
+//           
+//Sys = (user_input ||| Producer ||| Consumer ||| output) \{mlock, munlock, cadd, Pv, csub, Vv, cond_chan.1};
+
+#assert amain1 deadlockfree;
+#assert amain2 deadlockfree;
+//#define Prop1 (n < 2);
+//#assert Sys |= G Prop1;
+//#assert Sys |= G (GET_MSG -> F (USE_MSG));
+//#assert Sys |= G (GET_MSG_N.1 -> F (USE_MSG_N.1));
+

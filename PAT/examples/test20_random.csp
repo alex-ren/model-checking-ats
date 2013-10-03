@@ -1,0 +1,28 @@
+﻿
+channel thread_ch[10] 0;
+var g = 0;
+var g1 = 0;
+var g2 = 0;
+
+P(x) = {g = x;} -> Skip;
+
+
+main(n) = <> x:{1..n}@ P(x);
+
+Main1 = main(3 + 4);
+
+P1 = ifa (g == 3) {aa -> Skip}
+     else {ifa (g == 4) {bb -> Skip}};
+     
+P2 = ifa (g == 3) {aa -> Skip}
+     else {bb -> Skip};
+     
+P3 = ifa (g1 == 3) {aa -> Skip}
+     else {ifa (g2 == 4) {bb -> Skip}};
+     
+main2 = a1 -> a2 -> {g = 3;} -> a3 -> Skip;
+
+Main2 = main2 ||| P2;
+
+main3 = a1 -> a2 -> {g1 = 3;} -> a3 -> Skip;
+Main3 = main3 ||| P3;
