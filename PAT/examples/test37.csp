@@ -1,0 +1,129 @@
+#import "PStack";
+
+#import "MyLib";
+
+// =====================
+
+var<PStack> GStack = new PStack();
+var SysTid = 0;
+
+channel SysChSch 0;
+channel SysChSchStart 0;
+
+createThread(par, fn, arg) = SysChSch!fn.arg -> Skip;
+
+Scheduler = SysChSch?fn.arg ->
+  initSch{SysTid++; var tid = SysTid; GStack.allocateStack(tid);} ->
+  if (fn == 2) {
+    producer_s_77(false, SysTid, arg)
+    |||
+    SchedulerW(SysTid)
+  }
+  ;
+
+
+SchedulerW (tid) = SysChSchStart?tid -> Scheduler;
+
+// =====================
+
+var mutex[10];  // 10 mutex
+var mutex_count = 0;
+channel mutex_req 0;
+channel mutex_reply 0;
+
+mutex_allocator = mutex_req?_ -> {mutex_count++} -> mutex_reply!mutex_count -> mutex_allocator;
+mutex_allocate(tid) = mutex_req!1 -> mutex_reply?m -> { GStack.push(tid, m) } -> Skip;
+
+mutex_lock(tid, m) = [mutex[m] == 0] mlock{mutex[m] = 1} -> Skip;
+
+mutex_unlock(tid, m) = munlock{mutex[m] = 0} -> Skip;
+
+// ======================
+
+var cond_holder[10];  // 10 condition
+channel cond_chan[10] 0;
+var cond_count = 0;
+channel cond_req 0;
+channel cond_reply 0;
+
+cond_allocator = cond_req?_ -> {cond_count++} -> cond_reply!cond_count -> cond_allocator;
+cond_allocate(tid) = cond_req!1 -> cond_reply?m -> { GStack.push(tid, m) } -> Skip;
+
+cond_wait(tid, c, m) = atomic{cadd{cond_holder[c]++;} -> mutex_unlock(tid, m); cond_chan[c]?_ -> mutex_lock(tid, m)};
+
+cond_signal(tid, c) = atomic {if (cond_holder[c] > 0) {
+
+          csub{cond_holder[c]--;} ->
+
+          cond_chan[c]!1
+
+          -> Skip
+
+        }};
+
+
+cond_broadcast(tid, c) = atomic{if (cond_holder[c] > 0) {
+
+          signaln(c, cond_holder[c]); csub{cond_holder[c]=0;} -> Skip
+
+        }};
+
+signaln(c, n) = if (n > 0) {cond_chan[c]!1 -> signaln(c, n-1)}
+                else {Skip}
+                ;
+
+// =====================
+
+var gn_63;
+var m_64;
+var c_65;
+
+producer_66(isTailCall, tid, x_67) =
+  preloge{
+    if (isTailCall) {
+      GStack.reloadFrame(tid);
+    } else {
+      GStack.newFrame(tid);
+    }
+  } ->
+  mutex_lock(tid, m_64);
+  cond_wait(tid, c_65, m_64);
+  mutex_unlock(tid, m_64);
+  producer_66(true, tid, x_67)
+  ;
+
+producer_s_77(isTailCall, tid, x_76) =
+  preloge{
+    if (isTailCall) {
+      GStack.reloadFrame(tid);
+    } else {
+      GStack.newFrame(tid);
+    }
+  } ->
+  SysChSchStart!tid ->
+  producer_66(isTailCall, tid, x_76)
+  ;
+
+main_s(tid) = 
+  main_preloge {GStack.allocateStack(tid); GStack.newFrame(tid); GStack.newFrame(tid);} -> 
+  {  gn_63 = 0;
+  } ->
+  mutex_allocate(tid);
+  {  m_64 = GStack.get(tid, 0, 0);
+  } ->
+  cond_allocate(tid);
+  {  c_65 = GStack.get(tid, 0, 1);
+  } ->
+  {  var main_ret_72 = 0;
+  GStack.deleteFrame(tid); GStack.push(tid, main_ret_72);
+  } ->
+  Skip;
+
+main = main_s(0) ||| Scheduler ||| mutex_allocator ||| cond_allocator;
+
+
+#assert main deadlockfree;
+
+#define Prop1 (gn_22 < 2);
+
+#assert main |= G Prop1;
