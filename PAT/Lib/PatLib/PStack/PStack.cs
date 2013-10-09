@@ -63,6 +63,12 @@ namespace PAT.Lib
             m_stacks[tid] = FrameStackUtil.deleteFrame(sf);
         }
 
+        public void reloadFrame(int tid)
+        {
+            FrameStack sf = m_stacks[tid];  // stack of frames
+            m_stacks[tid] = FrameStackUtil.reloadFrame(sf);
+        }
+
         public void push(int tid, Object v)
         {
             FrameStack sf = m_stacks[tid];  // stack of frames

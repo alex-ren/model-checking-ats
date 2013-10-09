@@ -12,17 +12,24 @@ namespace PAT.Lib
     {
         public static FrameStack create()
         {
-            return null;
+            return FrameStack.nil();
         }
 
         public static FrameStack newFrame(FrameStack fs)
         {
-            return FrameStack.push(fs, Frame.create());
+            return FrameStack.cons(fs, Frame.create());
         }
 
         public static FrameStack deleteFrame(FrameStack fs)
         {
             return fs.getNext();
+        }
+
+        public static FrameStack reloadFrame(FrameStack fs)
+        {
+            FrameStack nextFS = fs.getNext();
+
+            return FrameStack.cons(nextFS, Frame.create());
         }
 
         public static FrameStack push(FrameStack fs, Object v)
@@ -32,7 +39,7 @@ namespace PAT.Lib
 
             Frame x2 = Frame.push(x, v);
 
-            return FrameStack.push(sStack, x2);
+            return FrameStack.cons(sStack, x2);
         }
 
         public static Object get(FrameStack fs, int frameno, int index)

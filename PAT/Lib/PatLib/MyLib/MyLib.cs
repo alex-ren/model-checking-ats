@@ -21,6 +21,10 @@ namespace PAT.Lib
     /// </summary>
     public class Example
     {
+        public static int add(int x, int y)
+        {
+            return x + y;
+        }
 
         public static int sub(int x, int y)
         {
@@ -32,9 +36,34 @@ namespace PAT.Lib
             return x * y;
         }
 
+        public static int div(int x, int y)
+        {
+            return x * y;
+        }
+
         public static bool gt(int x, int y)
         {
             return x > y;
+        }
+
+        public static bool gte(int x, int y)
+        {
+            return x >= y;
+        }
+
+        public static bool lt(int x, int y)
+        {
+            return x < y;
+        }
+
+        public static bool lte(int x, int y)
+        {
+            return x <= y;
+        }
+
+        public static bool eq(int x, int y)
+        {
+            return x == y;
         }
 
         //==========================================================

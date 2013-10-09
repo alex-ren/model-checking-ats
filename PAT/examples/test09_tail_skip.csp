@@ -1,0 +1,5 @@
+﻿A = a -> B; Skip;
+
+B = b -> A; Skip;
+
+#assert A deadlockfree;

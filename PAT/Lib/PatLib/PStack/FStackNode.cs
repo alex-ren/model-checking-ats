@@ -19,12 +19,12 @@ namespace PAT.Lib
             m_tail = s;
         }
 
-        public static FStackNode<T> create()
+        public static FStackNode<T> nil()
         {
             return null;
         }
 
-        public static FStackNode<T> push(FStackNode<T> s, T x)
+        public static FStackNode<T> cons(FStackNode<T> s, T x)
         {
             return new FStackNode<T>(x, s);
         }

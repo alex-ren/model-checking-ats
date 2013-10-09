@@ -21,12 +21,12 @@ namespace PAT.Lib
 
         public static FLenStack<T> create()
         {
-            return new FLenStack<T>(0, FStackNode<T>.create());
+            return new FLenStack<T>(0, FStackNode<T>.nil());
         }
         
         public static FLenStack<T> push(FLenStack<T> s, T x)
         {
-            FStackNode<T> node = FStackNode<T>.push(s.m_node, x);
+            FStackNode<T> node = FStackNode<T>.cons(s.m_node, x);
             int len = s.m_len + 1;
             return new FLenStack<T>(len, node);
         }
