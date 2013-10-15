@@ -55,6 +55,10 @@
       <Project>{DB17ED39-B0D3-4B8D-B32B-AC5C2E27000D}</Project>
       <Name>IntHolder</Name>
     </ProjectReference>
+    <ProjectReference Include="..\MyLib\MyLib.csproj">
+      <Project>{7738C918-5BA4-44C7-866D-40AE16496ADD}</Project>
+      <Name>MyLib</Name>
+    </ProjectReference>
     <ProjectReference Include="..\PStack\PStack.csproj">
       <Project>{D04A4A44-29E0-43DE-93C3-03BEFA014686}</Project>
       <Name>PStack</Name>

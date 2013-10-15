@@ -1,0 +1,56 @@
+﻿
+//#import "PStack";
+
+#import "MyLib";
+
+// var glist = call(alist_nil);
+var LinkedList = new LinkedList();
+var g = LinkedList.list_nil();
+
+P = a -> {g = LinkedList.list_cons(3, LinkedList.list_nil());} -> {g = LinkedList.list_cons(3, LinkedList.list_nil());} -> {g = LinkedList.list_cons(3, LinkedList.list_nil());} -> Skip;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//channel ch1 0;
+//channel ch2 0;
+//
+//P = ch1?x -> b -> ch2!3 -> P;
+//
+//Q = a -> ch1!3 -> ch2?x -> Q;
+//
+////Z = P ||| (Q \ {ch1});
+////
+////#assert P deadlockfree;
+////#assert Z deadlockfree;
+////
+//
+//P1 = (P ||| Q) \{ch1, ch2};
+//P2 = a -> b -> P2;
+//
+//#assert P1 refines P2;
+//#assert P2 refines P1;
+//
+//#assert P1 refines<F> P2;
+//#assert P2 refines<F> P1;
+//
+//#assert P1 refines<FD> P2;
+//#assert P2 refines<FD> P1;
+//
+//QQ = a -> QQ; Skip;
+
+ 

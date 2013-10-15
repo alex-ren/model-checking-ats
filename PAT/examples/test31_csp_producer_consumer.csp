@@ -10,10 +10,13 @@ var SysTid = 0;
 channel SysChSch 0;
 channel SysChSchStart 0;
 
+channel thread_chs[32] 0;
+var<Allocator> tid_allocator = new Allocator(32);
+
 createThread(par, fn, arg) = SysChSch!fn.arg -> Skip;
 
-Scheduler = SysChSch?fn.arg ->
-  initSch{SysTid++; var tid = SysTid; GStack.allocateStack(tid);} ->
+Scheduler = (SysChSch?fn.arg ->
+  initSch{SysTid = tid_allocator.allocate(); GStack.allocateStack(SysTid);} ->
   if (fn == 2) {
     consumer_s_57(false, SysTid, arg)
     |||
@@ -24,7 +27,7 @@ Scheduler = SysChSch?fn.arg ->
       |||
       SchedulerW(SysTid)
     }
-  }
+  })
   ;
 
 
@@ -32,8 +35,9 @@ SchedulerW (tid) = SysChSchStart?tid -> Scheduler;
 
 // =====================
 
-var mutex[10];  // 10 mutex
+var mutex[32];  // 10 mutex
 var mutex_count = 0;
+
 channel mutex_req 0;
 channel mutex_reply 0;
 
@@ -84,6 +88,8 @@ var gn_22;
 var m_23;
 var c_24;
 
+var gv = 0;
+
 producer_25(isTailCall, tid, x_26) =
   preloge{
     if (isTailCall) {
@@ -104,15 +110,16 @@ loop_27(isTailCall, tid, x_esc_43) =
       GStack.newFrame(tid);
     }
   } ->
-  {  var app_33 = call(eq, gn_22, 1);
+  producer_1{  var app_33 = call(gte, gn_22, 1);
   GStack.push(tid, app_33);
   } ->
   if (GStack.getBool(tid, 0, 0)) {
     cond_wait(tid, c_24, m_23);
     loop_27(true, tid, x_esc_43)
   } else {
-    {  var add_tret_40 = call(add, gn_22, 1);
+   producer_2 {  var add_tret_40 = call(add, gn_22, 1);
     gn_22 = add_tret_40;
+    gv = 1 - gv;
     } ->
     cond_signal(tid, c_24);
     mutex_unlock(tid, m_23);
@@ -140,14 +147,14 @@ loop_30(isTailCall, tid, x_esc_44) =
       GStack.newFrame(tid);
     }
   } ->
-  {  var app_36 = call(eq, gn_22, 0);
+  consumer_1{  var app_36 = call(eq, gn_22, 0);
   GStack.push(tid, app_36);
   } ->
   if (GStack.getBool(tid, 0, 0)) {
     cond_wait(tid, c_24, m_23);
     loop_30(true, tid, x_esc_44)
   } else {
-    {  var sub_tret_41 = call(sub, gn_22, 1);
+    consumer_2{  var sub_tret_41 = call(sub, gn_22, 1);
     gn_22 = sub_tret_41;
     } ->
     cond_signal(tid, c_24);
@@ -196,11 +203,17 @@ main_s(tid) =
   } ->
   Skip;
 
-main = main_s(0) ||| Scheduler ||| mutex_allocator ||| cond_allocator;
+main = {SysTid = tid_allocator.allocate();} -> (main_s(SysTid) ||| Scheduler ||| mutex_allocator ||| cond_allocator);
 
 
 #assert main deadlockfree;
 
-#define Prop1 (gn_22 < 2);
+#define Prop1 (gv == 0);
+#define Prop2 (gv == 1);
+#define Prop3 (gv < 2);
 
-#assert main |= G Prop1;
+
+#assert main |= []F(Prop1 && X Prop2) || (Prop2 && X Prop1);
+#assert main |= [] Prop3;
+
+#assert main deterministic;
