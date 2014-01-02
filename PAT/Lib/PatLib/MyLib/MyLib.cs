@@ -21,6 +21,11 @@ namespace PAT.Lib
     /// </summary>
     public class Example
     {
+        public static int neg(int x)
+        {
+            return -x;
+        }
+
         public static int add(int x, int y)
         {
             return x + y;

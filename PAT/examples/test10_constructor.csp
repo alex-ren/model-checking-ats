@@ -1,0 +1,28 @@
+﻿#import "MyLib";
+
+var<ValueInt> v_int = new ValueInt(2);
+hvar v = v_int.getValue();
+
+var g;
+
+
+// The usage of "new".
+P = {v_int = new ValueInt(new ValueInt(33)); v = v_int.getValue();} -> Skip;
+
+// The usage of "hidden variable"
+Q = {v_int = new ValueInt(3); v = v_int.getValue();} -> Skip;
+
+// Gloval variable (not array) can hold anything.
+R = {v_int = 3; g = 3;} -> {g = new ValueInt(2); /*g.getValue(); wrong: type of g is not specificed */} ->
+    {v_int = new ValueInt(g);} -> Skip;
+
+
+#define Prop1 (v_int.getValue() == 2);
+#define Prop2 (v == 2);
+
+
+#assert P |= []F(Prop1);
+#assert P |= []F(Prop2);
+
+
+

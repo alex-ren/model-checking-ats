@@ -22,6 +22,14 @@ namespace PAT.Lib
             m_bytes = new Byte[(n - 1) / 8 + 1];
         }
 
+        public Allocator()
+        {
+            int n = 10;
+            m_bits = new BitArray(n);
+            m_bits.SetAll(false);
+            m_bytes = new Byte[(n - 1) / 8 + 1];
+        }
+
         public Allocator(BitArray bits, Byte[] bytes)
         {
             this.m_bits = bits;

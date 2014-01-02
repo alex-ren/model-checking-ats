@@ -44,11 +44,18 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Allocator.cs" />
+    <Compile Include="FLenStack.cs" />
+    <Compile Include="FrameStackUtil.cs" />
+    <Compile Include="FStackNode.cs" />
     <Compile Include="LinkedList.cs" />
-    <Compile Include="LinkNode.cs" />
+    <Compile Include="PStack.cs" />
+    <Compile Include="SysLinkedNode.cs" />
     <Compile Include="MemHolder.cs" />
     <Compile Include="MyLib.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ThreadAllocator.cs" />
+    <Compile Include="ValueArray.cs" />
+    <Compile Include="ValueInt.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

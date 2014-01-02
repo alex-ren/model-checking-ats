@@ -1,0 +1,15 @@
+﻿#import "MyLib";
+
+var<ValueArray> varr = new ValueArray(3);
+hvar<ValueInt> v = new ValueInt(3);
+
+P = {varr.set(0, 1);} -> {varr.set(1, 2);} -> {varr.set(2, new ValueInt(3)); v = varr.get(2);} -> Skip;
+
+
+#define Prop1 (varr.get(0) == 1);
+#define Prop2 (v.getValue() == 3);
+// #define Prop2 (varr.get(2).getValue() == 3);   // Wrong syntax
+
+
+#assert P |= []F(Prop1);
+#assert P |= []F(Prop2);

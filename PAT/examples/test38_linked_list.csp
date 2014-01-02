@@ -1,0 +1,12 @@
+﻿#import "MyLib";
+
+var<LinkedList> sys_list_creator = new LinkedList();
+var x = sys_list_creator.list_nil();
+// var<SysLinkedNode> y = call(list_nil);
+
+P = a -> Skip;
+channel ch 0;
+
+P1 = ch?xx -> {var y = xx;} -> Skip; {var y = xx;} -> Skip;
+
+

@@ -31,11 +31,12 @@ namespace PAT.Lib
             return fs.getNext();
         }
 
-        public static FrameStack reloadFrame(FrameStack fs)
+        public static FrameStack reloadFrame(FrameStack fs, SysLinkedNode xs)
         {
+            Frame fr = Frame.create(xs);
             FrameStack nextFS = fs.getNext();
 
-            return FrameStack.cons(nextFS, Frame.create());
+            return FrameStack.cons(nextFS, fr);
         }
 
         public static FrameStack push(FrameStack fs, Object v)
@@ -47,6 +48,16 @@ namespace PAT.Lib
 
             return FrameStack.cons(sStack, x2);
         }
+
+        public static FrameStack retopr(FrameStack fs, ref Object v)
+        {
+            Frame x = fs.getAtPos(0);
+            v = x.getFromTop(0);
+            fs = fs.getNext();
+            return fs;
+
+        }
+
 
         public static Object get(FrameStack fs, int frameno, int index)
         {

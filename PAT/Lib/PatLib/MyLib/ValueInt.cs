@@ -1,43 +1,39 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using System.Collections;
+
 using PAT.Common.Classes.Expressions.ExpressionClass;
 
 using PAT.Lib;
 
 namespace PAT.Lib
 {
-    public class LinkedList : ExpressionValue
+    public class ValueInt : ExpressionValue
     {
+        private int m_content;
 
-        public LinkedList()
+        public ValueInt()
         {
+            m_content = 0;
         }
 
-        public SysLinkedNode list_nil()
+        public ValueInt(int n)
         {
-            return null;
+            m_content = n;
         }
 
-        public SysLinkedNode list_cons(Object header, SysLinkedNode tail)
+        public ValueInt(Object obj)
         {
-            return new SysLinkedNode(header, tail);
+            m_content = 1;
         }
 
-        public Boolean list_is_nil(SysLinkedNode xs)
+        public int getValue()
         {
-            return (null == xs);
+            return m_content;
         }
-
-        public Object list_get_header(SysLinkedNode xs)
-        {
-            return xs.getValue();
-        }
-
-        public SysLinkedNode list_get_tail(SysLinkedNode xs)
-        {
-            return xs.getTail();
-        }
+        
 
         /// <summary>
         /// Please implement this method to provide the string representation of the datatype
@@ -46,7 +42,7 @@ namespace PAT.Lib
         ///        
         public override string ToString()
         {
-            return "LinkedList";
+            return m_content.ToString();
         }
 
         /// <summary>
@@ -64,7 +60,11 @@ namespace PAT.Lib
         /// <returns></returns>
         public override string ExpressionID
         {
-            get { return this.ToString(); }
+            get
+            {
+                byte[] bytes = BitConverter.GetBytes(m_content);
+                return Convert.ToBase64String(bytes);
+            }
         }
     }
 }

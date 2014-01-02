@@ -54,10 +54,27 @@ namespace PAT.Lib
             m_stacks[tid] = sf;
         }
 
+        public Object retopr_frame(int tid)
+        {
+            FrameStack sf = m_stacks[tid];  // stack of frames
+            Object v = null;
+            m_stacks[tid] = FrameStackUtil.retopr(sf, ref v);
+            return v;
+        }
+
         public void delete_frame(int tid)
         {
             FrameStack sf = m_stacks[tid];  // stack of frames
             m_stacks[tid] = FrameStackUtil.deleteFrame(sf);
+        }
+
+
+        public void reload_frame(int tid, Object frame)
+        {
+            FrameStack sf = m_stacks[tid];
+            SysLinkedNode aFrame = (SysLinkedNode)frame;
+            sf = FrameStackUtil.reloadFrame(sf, aFrame);
+            m_stacks[tid] = sf;
         }
 
         //public void allocateStack(int tid)
@@ -79,11 +96,6 @@ namespace PAT.Lib
         //}
 
 
-        //public void reloadFrame(int tid)
-        //{
-        //    FrameStack sf = m_stacks[tid];  // stack of frames
-        //    m_stacks[tid] = FrameStackUtil.reloadFrame(sf);
-        //}
 
         public void frame_push(int tid, Object v)
         {
@@ -97,10 +109,22 @@ namespace PAT.Lib
             return (bool)ret;
         }
 
-        public int frame_get(int tid, int frame, int index)
+        public Object frame_get(int tid, int frame, int index)
+        {
+            Object ret = get(tid, frame, index);
+            return ret;
+        }
+
+        public int frame_get_int(int tid, int frame, int index)
         {
             Object ret = get(tid, frame, index);
             return (int)ret;
+        }
+
+        public SysLinkedNode frame_get_list(int tid, int frame, int index)
+        {
+            Object ret = get(tid, frame, index);
+            return (SysLinkedNode)ret;
         }
 
         private Object get(int tid, int frame, int index)

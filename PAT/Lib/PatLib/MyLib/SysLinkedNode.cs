@@ -7,21 +7,22 @@ using PAT.Lib;
 
 namespace PAT.Lib
 {
-    public class LinkedNode : ExpressionValue
+    public class SysLinkedNode : ExpressionValue
     {
         private Object m_v;
-        private LinkedNode m_next;
+        private SysLinkedNode m_next;
         private Guid m_id;
 
-        public LinkedNode(Object v, LinkedNode next)
+        public static SysLinkedNode nil()
+        {
+            return null;
+        }
+
+        public SysLinkedNode(Object v, SysLinkedNode next)
         {
             m_v = v;
             m_next = next;
             m_id = Guid.NewGuid();
-        }
-
-        public LinkedNode()
-        {
         }
 
         public Object getValue()
@@ -29,7 +30,7 @@ namespace PAT.Lib
             return m_v;
         }
 
-        public LinkedNode getTail()
+        public SysLinkedNode getTail()
         {
             return m_next;
         }
@@ -37,7 +38,7 @@ namespace PAT.Lib
         private string getContent()
         {
             string ret = "";
-            LinkedNode link = this;
+            SysLinkedNode link = this;
             while (null != link)
             {
                 ret += link.m_v.ToString();

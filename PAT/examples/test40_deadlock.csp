@@ -1,0 +1,21 @@
+﻿
+var sys_thread_num = 0;
+
+channel sys_ch_sch 0;
+Scheduler() = (atomic{sys_ch_sch?sys_tid.fn.args-> Skip})
+  ||
+  ifa (sys_thread_num == 0) {Skip}
+  ;
+  
+  
+main =
+(  (Skip)
+   ||| ((((Skip)
+          |||(Scheduler())
+)
+[]ifa (sys_thread_num == 0) {Skip} else {Skip}
+))
+)
+;
+
+#assert main deadlockfree;

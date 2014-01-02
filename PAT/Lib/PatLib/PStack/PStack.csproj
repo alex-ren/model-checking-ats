@@ -49,6 +49,12 @@
     <Compile Include="PStack.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MyLib\MyLib.csproj">
+      <Project>{7738C918-5BA4-44C7-866D-40AE16496ADD}</Project>
+      <Name>MyLib</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>copy $(TargetPath) G:\Programs\"Process Analysis Toolkit"\"Process Analysis Toolkit 3.5.0"\Lib\$(TargetFileName)</PostBuildEvent>
