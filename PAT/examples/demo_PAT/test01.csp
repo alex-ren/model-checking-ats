@@ -1,0 +1,8 @@
+﻿#import "IntHolder";
+
+var<IntHolder> holder = new IntHolder(3);
+
+var x;
+
+P = {x = 1;} -> {x = holder;} -> {x = call(getInt);} -> Skip;
+

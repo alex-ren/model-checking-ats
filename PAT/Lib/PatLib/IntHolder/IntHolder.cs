@@ -36,7 +36,7 @@ namespace PAT.Lib
 
         public override string ToString()
         {
-            return "";
+            return m_v.ToString(); 
         }
 
         public int get()
@@ -66,93 +66,99 @@ namespace PAT.Lib
         /// <returns></returns>
         public override string ExpressionID
         {
-            get { return ""; }
+            get { return m_v.ToString(); }
+        }
+
+        static public IntHolder getInt()
+        {
+            return new IntHolder(99);
         }
 
     }
 
-    public class Monitor : ExpressionValue
-    {
+    //public class Monitor : ExpressionValue
+    //{
 
-        /// <summary>
-        /// Please implement this method to provide the string representation of the datatype
-        /// </summary>
-        /// <returns></returns>
-        public int m_mutex;
-        public Monitor()
-        {
-            m_mutex = 0;
-        }
 
-        public void Wait(int tid)
-        {
-            // todo
-            // put tid into waiting queue
+    //    /// <summary>
+    //    /// Please implement this method to provide the string representation of the datatype
+    //    /// </summary>
+    //    /// <returns></returns>
+    //    public int m_mutex;
+    //    public Monitor()
+    //    {
+    //        m_mutex = 0;
+    //    }
 
-        }
-        public bool CanGo(int tid)
-        {
-            return false;
-        }
+    //    public void Wait(int tid)
+    //    {
+    //        // todo
+    //        // put tid into waiting queue
 
-        public override string ToString()
-        {
-            return "Monitor";
-        }
+    //    }
+    //    public bool CanGo(int tid)
+    //    {
+    //        return false;
+    //    }
 
-        /// <summary>
-        /// Please implement this method to return a deep clone of the current object
-        /// </summary>
-        /// <returns></returns>
-        public override ExpressionValue GetClone()
-        {
-            return new Monitor();
-        }
+    //    public override string ToString()
+    //    {
+    //        return "Monitor";
+    //    }
+
+    //    /// <summary>
+    //    /// Please implement this method to return a deep clone of the current object
+    //    /// </summary>
+    //    /// <returns></returns>
+    //    public override ExpressionValue GetClone()
+    //    {
+    //        return new Monitor();
+    //    }
             
-        /// <summary>
-        /// Please implement this method to provide the compact string representation of the datatype
-        /// </summary>
-        /// <returns></returns>
-        public override string ExpressionID
-        {
-            get { return "Monitor"; }
-        }
+    //    /// <summary>
+    //    /// Please implement this method to provide the compact string representation of the datatype
+    //    /// </summary>
+    //    /// <returns></returns>
+    //    public override string ExpressionID
+    //    {
+    //        get { return "Monitor"; }
+    //    }
 
-    }
+    //}
 
-    public class NoMoreThreadException : System.Exception
-    {
-        public NoMoreThreadException()
-        {
-        }
+    //public class NoMoreThreadException : System.Exception
+    //{
+    //    public NoMoreThreadException()
+    //    {
+    //    }
 
-        public override string ToString()
-        {
-            return "No more thread";
-        }
-    }
+    //    public override string ToString()
+    //    {
+    //        return "No more thread";
+    //    }
+    //}
 
-    public class IATSRuntimeLib
-    {
-        public static int GetTid(int[] threads_stat)
-        {
-            int i = 0;
-            for (; i < threads_stat.Length; i++)
-            {
-                if (threads_stat[i] == 0)
-                {
-                    threads_stat[i] = 1;
-                    break;
-                }
-            }
+    //public class IATSRuntimeLib
+    //{
+    //    public static int GetTid(int[] threads_stat)
+    //    {
+    //        int i = 0;
+    //        for (; i < threads_stat.Length; i++)
+    //        {
+    //            if (threads_stat[i] == 0)
+    //            {
+    //                threads_stat[i] = 1;
+    //                break;
+    //            }
+    //        }
 
-            if (i == threads_stat.Length)
-            {
-                throw new NoMoreThreadException();
-            }
-            return i;
+    //        if (i == threads_stat.Length)
+    //        {
+    //            throw new NoMoreThreadException();
+    //        }
+    //        return i;
 
-        }
-    }
+    //    }
+    //}
 
 }

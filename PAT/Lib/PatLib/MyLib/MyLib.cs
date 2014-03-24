@@ -21,6 +21,11 @@ namespace PAT.Lib
     /// </summary>
     public class Example
     {
+        public static Boolean negation(Boolean x)
+        {
+            return !x;
+        }
+
         public static int neg(int x)
         {
             return -x;

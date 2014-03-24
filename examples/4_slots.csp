@@ -1,0 +1,61 @@
+﻿
+var sys_assert_var = true;
+
+// ==============
+
+var mwp = 0;
+var mwi = 0;
+var min_write = 0;
+var mw_init = 0;
+
+var L = 0;
+var R = 0;
+var slot[2];
+var data[4];
+
+// ==============
+
+var wp = 0;
+var wi = 0;
+var w_init = 0;
+
+loop_write = write_one; loop_write;
+
+write_one =
+  a1{wp = 1 - R;} -> a2{wi = 1 - slot[wp];} ->
+  a3{mwp = wp; mwi = wi; min_write = 1;} ->
+  a6{data[2 * wp + wi] = 1;} ->
+  a7{min_write = 0;} ->
+  a8{slot[wp] = wi;} ->
+  a9{L = wi;} ->
+  a10{mw_init = 1;} -> Skip;
+
+// ==============
+
+var rp = 0;
+var ri = 0;
+var lwp = 0;
+var lwi = 0;
+var lin_write = 0;
+
+loop_read = 
+  b1{w_init = mw_init;} ->
+  b2{sys_assert_var = (w_init > 0);} ->
+  b3{rp = L;} ->
+  b4{R = rp;} ->
+  b5{ri = slot[rp];} ->
+  b6{lwp = mwp; lwi = mwi; lin_write = min_write;} ->
+  b9{var x = !((lin_write == 1) && (lwp == rp) && (lwi == ri));
+   sys_assert_var = x;
+  } -> loop_read;
+                
+// ==============
+
+main = write_one; (loop_write ||| loop_read);
+
+#define sys_assertion sys_assert_var == true;
+#assert main |= G sys_assertion;
+
+#assert main deadlockfree;
+
+

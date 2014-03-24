@@ -76,8 +76,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>copy $(TargetPath) G:\Programs\"Process Analysis Toolkit"\"Process Analysis Toolkit 3.5.0"\Lib\$(TargetFileName)
-copy $(ProjectDir)IntHolder.cs "G:\Programs\Process Analysis Toolkit\Process Analysis Toolkit 3.5.0\Lib\"IntHolder.cs</PostBuildEvent>
+    <PostBuildEvent>copy $(TargetPath) G:\Programs\"Process Analysis Toolkit"\"Process Analysis Toolkit 3.5.0"\Lib\$(TargetFileName)</PostBuildEvent>
   </PropertyGroup>
   <PropertyGroup>
     <PreBuildEvent>
